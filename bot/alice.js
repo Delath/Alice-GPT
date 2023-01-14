@@ -17,6 +17,7 @@ const bot = new TelegramBot(token, {polling: true});
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
+
   if (chatId==adminChatId) {
     openaiCall(msg.text);
   } else {
@@ -33,7 +34,6 @@ async function openaiCall(input){
       max_tokens: 4000
     });
 
-    console.log(completion.data.choices)
     const answer = completion.data.choices[0].text;
 
     bot.sendMessage(adminChatId, answer);
@@ -41,5 +41,4 @@ async function openaiCall(input){
     // Might implement my own error handling logic here
     console.error(error);
   }
-
-}
+};
