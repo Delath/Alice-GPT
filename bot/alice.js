@@ -1,10 +1,18 @@
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
+
 const TelegramBot = require('node-telegram-bot-api');
 
-const token = process.env.BOT_TOKEN;
-const adminChatId = process.env.ADMIN_ID;
+const openaiLib = require("openai");
+const Configuration = openaiLib.Configuration;
+const OpenAIApi = openaiLib.OpenAIApi;
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
+const adminChatId = process.env.ADMIN_ID;
+const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, {polling: true});
 
 bot.on('message', (msg) => {
@@ -18,22 +26,19 @@ bot.on('message', (msg) => {
 
 async function openaiCall(input){
   try {
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ input: input }),
+    const completion = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: "You are a ai built on a large dataset of data and a human is speaking to you expecting that you say something as if you were a human too, here is what he says: "+input,
+      temperature: 0.5,
+      max_tokens: 4000
     });
 
-    const data = await response.json();
-    if (response.status !== 200) {
-      throw data.error || new Error(`Request failed with status ${response.status}`);
-    }
+    console.log(completion.data.choices)
+    const answer = completion.data.choices[0].text;
 
-    bot.sendMessage(adminChatId, data.result);
+    bot.sendMessage(adminChatId, answer);
   } catch(error) {
-    // Consider implementing your own error handling logic here
+    // Might implement my own error handling logic here
     console.error(error);
   }
 
