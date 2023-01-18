@@ -7,7 +7,7 @@ const openaiLib = require("openai");
 const Configuration = openaiLib.Configuration;
 const OpenAIApi = openaiLib.OpenAIApi;
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY
 });
 const openai = new OpenAIApi(configuration);
 const adminChatId = process.env.ADMIN_ID;
