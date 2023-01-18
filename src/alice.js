@@ -28,32 +28,29 @@ bot.on('message', (msg) => {
 async function openaiCall(input){
   try {
     let memories = '';
-  
+
     fs.readFile('brain.txt', 'utf8', (err, data) => {
       if (err) throw err;
-      memories = data;
-    });
+      memories = data + "\n" + adminName + ": " + input + "\nAlice:";
+
+      const completion = openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: memories,
+        temperature: 0.5,
+        max_tokens: 3000
+      }).then(completion => {
+        const answer = completion.data.choices[0].text;
+      
+        bot.sendMessage(adminChatId, answer);
+        
+        memories = memories + answer;
     
-    memories = memories + "\n" + adminName + ": " + input + "\nAlice: "
-  
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: memories,
-      temperature: 0.5,
-      max_tokens: 4000
+        fs.writeFile('brain.txt', memories, (err) => {
+          if (err) throw err;
+          console.log('Alice Memories have been updated!');
+        });  
+      });
     });
-
-    const answer = completion.data.choices[0].text;
-
-    bot.sendMessage(adminChatId, answer);
-
-    memories = memories + answer;
-  
-    fs.writeFile('brain.txt', memories, (err) => {
-      if (err) throw err;
-      console.log('Alice Memories have been updated!');
-    });
-
   } catch(error) {
     // Might implement my own error handling logic here
     console.error(error);
