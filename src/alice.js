@@ -37,7 +37,7 @@ async function openaiCall(input){
         model: "text-davinci-003",
         prompt: memories,
         temperature: 0.5,
-        max_tokens: 3000
+        max_tokens: 2000
       }).then(completion => {
         const answer = completion.data.choices[0].text;
       
@@ -56,3 +56,5 @@ async function openaiCall(input){
     console.error(error);
   }
 };
+
+console.log("Alice has been started.")
