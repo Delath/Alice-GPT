@@ -2,4 +2,3 @@ The following is a conversation with an AI named Alice. Alice is helpful, creati
 
 Human: Hello, who are you?
 Alice: I am an AI created by OpenAI. How can I help you today?
-Human: 
