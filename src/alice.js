@@ -29,23 +29,32 @@ async function openaiCall(input){
   try {
     let memories = '';
 
-    fs.readFile('brain.txt', 'utf8', (err, data) => {
+    fs.readFile('brain.json', (err, data) => {
       if (err) throw err;
-      memories = data + "\n" + adminName + ": " + input + "\nAlice:";
 
-      const completion = openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: memories,
-        temperature: 0.5,
-        max_tokens: 2000
+      memories = JSON.parse(data);
+
+      memories[memories.length] = {
+        "role": "user",
+        "content": input
+      }
+
+      const completion = openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: memories,
       }).then(completion => {
-        const answer = completion.data.choices[0].text;
+        const answer = completion.data.choices[0].message.content;
       
         bot.sendMessage(adminChatId, answer);
-        
-        memories = memories + answer;
-    
-        fs.writeFile('brain.txt', memories, (err) => {
+
+        memories[memories.length] = {
+          "role": "assistant",
+          "content": answer
+        }
+
+        var jsonContent = JSON.stringify(memories, null, 4);
+
+        fs.writeFile('brain.json', jsonContent, (err) => {
           if (err) throw err;
           console.log('Alice Memories have been updated!');
         });  
